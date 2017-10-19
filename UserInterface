@@ -1,0 +1,196 @@
+package addressbook;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+public class UserInterface extends JPanel implements ActionListener {
+
+	private static final long serialVersionUID = 2161244209167568887L;
+
+	// The Frame
+	private static JFrame mainFrame;
+
+	// DefaultListModel to setup JList data handling
+	// JList to display the Contacts
+	private DefaultListModel<String> model;
+	private JList<String> contactList;
+
+	// Menu bar and accompanying menu items
+	private JMenuBar menuBar;
+	private JMenu menu;
+	private JMenuItem newContactMenuButton;
+	private JMenuItem exitAppMenuButton;
+
+	// Buttons
+	private JButton newContactButton;
+	private JButton openContactButton;
+	private JButton deleteContactButton;
+
+	// Panels to place components into
+	private JPanel mainPanel;
+	private JPanel buttonPanel;
+
+	// For popup message dialogs
+	private JFrame messageDialog;
+
+	public Component mainScreen() {
+
+		// Create the DefaultListModel object
+		// Add the JList
+		// Set a black border to JList container
+		model = new DefaultListModel<String>();
+		for (String key : Book.addressBook.keySet()) {
+			model.addElement(key);
+		}
+
+		contactList = new JList<String>(model);
+		contactList.setBorder(BorderFactory.createLineBorder(Color.black));
+		contactList.setPreferredSize(new Dimension(100, 150));
+
+		// Creating the menu bar and its items
+		// Adding ActionListeners to the menu buttons
+		menuBar = new JMenuBar();
+		menu = new JMenu("File");
+		newContactMenuButton = new JMenuItem("New Contact");
+		exitAppMenuButton = new JMenuItem("Exit");
+		newContactMenuButton.addActionListener(this);
+		exitAppMenuButton.addActionListener(this);
+		menu.add(newContactMenuButton);
+		menu.add(exitAppMenuButton);
+		menuBar.add(menu);
+
+		// Creating the Buttons
+		// Adding ActionListeners to the buttons
+		newContactButton = new JButton("New Contact");
+		openContactButton = new JButton("Open Contact");
+		deleteContactButton = new JButton("Delete Contact");
+		newContactButton.addActionListener(this);
+		openContactButton.addActionListener(this);
+		deleteContactButton.addActionListener(this);
+
+		// Creating the Panels with Grid Layouts
+		mainPanel = new JPanel(new GridLayout());
+		buttonPanel = new JPanel(new GridLayout(0, 1));
+
+		// Adding components to the Panels
+		mainPanel.add(contactList);
+		buttonPanel.add(newContactButton);
+		buttonPanel.add(openContactButton);
+		buttonPanel.add(deleteContactButton);
+
+		// Adding and aligning the Panels
+		setBorder(BorderFactory.createEmptyBorder(45, 45, 45, 45));
+		add(mainPanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.EAST);
+
+		return this;
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getSource() == newContactButton) {
+			addContact();
+		}
+
+		if (e.getSource() == openContactButton) {
+			openContact();
+		}
+
+		if (e.getSource() == deleteContactButton) {
+			deleteContact();
+		}
+
+		if (e.getSource() == newContactMenuButton) {
+			addContact();
+		}
+
+		if (e.getSource() == exitAppMenuButton) {
+			System.exit(0);
+		}
+	}
+
+	private void addContact() {
+
+		mainFrame.getContentPane().removeAll();
+		mainFrame.add(new NewContactScreen().newEntryScreen());
+
+		mainFrame.revalidate();
+		mainFrame.repaint();
+
+	}
+
+	private void openContact() {
+
+		if (!contactList.isSelectionEmpty()) {
+			String contact = contactList.getSelectedValue();
+
+			mainFrame.getContentPane().removeAll();
+			mainFrame.add(new ViewContactScreen(contact).viewContactScreen());
+
+			mainFrame.revalidate();
+			mainFrame.repaint();
+		}
+	}
+
+	private void deleteContact() {
+
+		if (contactList.isSelectionEmpty()) {
+			JOptionPane.showMessageDialog(messageDialog, "No contact selected.");
+
+		} else if (!contactList.isSelectionEmpty()) {
+
+			int[] selectedContacts = contactList.getSelectedIndices();
+			ArrayList<Integer> selectedContactsList = new ArrayList<Integer>();
+			List<String> selectedKeys = new ArrayList<String>(contactList.getSelectedValuesList());
+
+			for (int value : selectedContacts) {
+				selectedContactsList.add(value);
+			}
+
+			Collections.sort(selectedContactsList, Collections.reverseOrder());
+
+			for (int value : selectedContactsList) {
+				model.remove(value);
+			}
+
+			for (String value : selectedKeys) {
+
+				Book.addressBook.remove(value);
+
+			}
+
+		}
+	}
+
+	public void CreateAndShowUI() {
+		mainFrame = new JFrame("Addressbook Application");
+		mainFrame.setPreferredSize(new Dimension(350, 400));
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.add(mainScreen());
+		mainFrame.setJMenuBar(this.menuBar);
+		mainFrame.pack();
+		mainFrame.setVisible(true);
+	}
+
+}

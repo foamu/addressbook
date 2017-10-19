@@ -1,0 +1,146 @@
+package addressbook;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class NewContactScreen extends JPanel implements ActionListener {
+
+	private static final long serialVersionUID = 3627057278792545325L;
+
+	// Declare panels
+	private JPanel labelPanel;
+	private JPanel contactEntryPanel;
+	private JPanel buttonPanel;
+
+	// Declare buttons
+	private JButton addContactButton;
+	private JButton cancelButton;
+
+	// Declare labels
+	private JLabel nameLabel;
+	private JLabel phoneNumLabel;
+	private JLabel emailLabel;
+
+	// Declare text fields used for entering contact info
+	private JTextField nameField;
+	private JTextField phoneNumField;
+	private JTextField emailField;
+
+	// For popup messages.
+	private JFrame messageDialog;
+
+	public Component newEntryScreen() {
+
+		// Create the panels
+		labelPanel = new JPanel(new GridLayout(3, 0));
+		contactEntryPanel = new JPanel(new GridLayout(3, 0));
+		buttonPanel = new JPanel(new GridLayout(2, 0));
+
+		// Create the buttons & add ActionListeners to them
+		addContactButton = new JButton("Add Contact");
+		cancelButton = new JButton("Cancel");
+		addContactButton.addActionListener(this);
+		cancelButton.addActionListener(this);
+
+		// Create the labels
+		nameLabel = new JLabel("Name");
+		phoneNumLabel = new JLabel("Phone #");
+		emailLabel = new JLabel("Email");
+
+		// Create the TextFields
+		nameField = new JTextField();
+		phoneNumField = new JTextField();
+		emailField = new JTextField(10);
+
+		// Adding the JLabels to a JPanel
+		labelPanel.add(nameLabel);
+		labelPanel.add(phoneNumLabel);
+		labelPanel.add(emailLabel);
+
+		// Adding the JTextFields to a JPanel
+		contactEntryPanel.add(nameField);
+		contactEntryPanel.add(phoneNumField);
+		contactEntryPanel.add(emailField);
+
+		// Adding the Buttons to a panel
+		buttonPanel.add(addContactButton);
+		buttonPanel.add(cancelButton);
+
+		// Adding and aligning the Panels
+		setBorder(BorderFactory.createEmptyBorder(45, 45, 45, 45));
+		add(labelPanel, BorderLayout.WEST);
+		add(contactEntryPanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.EAST);
+
+		return this;
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getSource() == addContactButton) {
+			addNewContact();
+		}
+
+		if (e.getSource() == cancelButton) {
+			cancelNewContact();
+		}
+	}
+
+	private void addNewContact() {
+
+		String name = nameField.getText();
+		String phoneNumber = phoneNumField.getText();
+		String email = emailField.getText();
+
+		if (!nameField.getText().isEmpty()) {
+
+			if (nameField.getText().length() >= 16) {
+				JOptionPane.showMessageDialog(messageDialog, "Names must be ");
+				
+			} else {
+				Book.addressBook.put(name, new Contact(name, phoneNumber, email));
+			}
+
+		} else if (!phoneNumField.getText().isEmpty()) {
+
+			Book.addressBook.put(phoneNumber, new Contact(name, phoneNumber, email));
+
+		} else if (!emailField.getText().isEmpty()) {
+
+			Book.addressBook.put(email, new Contact(name, phoneNumber, email));
+
+		} else {
+
+			JOptionPane.showMessageDialog(messageDialog, "No content to save, discarding contact.");
+
+		}
+
+		this.removeAll();
+		this.add(new UserInterface().mainScreen());
+		this.revalidate();
+		this.repaint();
+
+	}
+
+	private void cancelNewContact() {
+
+		this.removeAll();
+		this.add(new UserInterface().mainScreen());
+		this.revalidate();
+		this.repaint();
+	}
+
+}

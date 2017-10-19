@@ -1,0 +1,27 @@
+package addressbook;
+
+import java.awt.EventQueue;
+
+public class Main {
+
+	public static void main(String[] args) {
+		
+		 EventQueue.invokeLater(new Runnable() {
+
+	            @Override
+	            public void run() {
+	            	new UserInterface().CreateAndShowUI();
+	            }
+	        });
+		
+	}
+	
+	/* To do list:
+	 * Add new contacts - done
+	 * Update existing contacts - done
+	 * Retrieve and display individual contact - done
+	 * Deletion of contacts - done
+	 * Display updated list of all contacts, in alphabetical order - done
+	 */
+	
+}

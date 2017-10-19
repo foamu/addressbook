@@ -1,0 +1,10 @@
+package addressbook;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+public class Book {
+	
+	public static Map<String, Contact> addressBook = new TreeMap<String, Contact>();
+	
+	}

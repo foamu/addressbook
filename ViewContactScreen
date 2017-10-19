@@ -1,0 +1,181 @@
+package addressbook;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class ViewContactScreen extends JPanel implements ActionListener {
+	
+	private static final long serialVersionUID = -645408679062716166L;
+
+	// String to identify which contact being opened
+	private String contact;
+	
+	// Declare panels for display & buttons
+	private JPanel labelPanel;
+	private JPanel contactPanel;
+	private JPanel buttonPanel;
+	
+	// Declare buttons
+	private JButton editButton;
+	private JButton backButton;
+	private JButton saveButton;
+	
+	// Declare labels
+	private JLabel nameLabel;
+	private JLabel phoneNumberLabel;
+	private JLabel emailLabel;
+	
+	// Declare labels for displaying contact info
+	private JLabel contactNameLabel;
+	private JLabel contactPhoneNumberLabel;
+	private JLabel contactEmailLabel;
+	
+	// Declare text fields for editing
+	private JTextField nameField;
+	private JTextField phoneNumField;
+	private JTextField emailField;
+	
+	public ViewContactScreen(String contact) {
+		this.contact = new String(contact);
+	}
+	
+	public Component viewContactScreen() {
+		
+		// Create the panels and their layouts
+		labelPanel = new JPanel(new GridLayout(3, 0));
+		contactPanel = new JPanel(new GridLayout(3, 2));
+		buttonPanel = new JPanel(new GridLayout(2, 0));
+		
+		// Create the default buttons, and add ActionListeners to them
+		editButton = new JButton("Edit");
+		backButton = new JButton("Back");
+		
+		editButton.addActionListener(this);
+		backButton.addActionListener(this);
+		
+		// Create labels
+		nameLabel = new JLabel("Name:");
+		phoneNumberLabel = new JLabel("Phone #:");
+		emailLabel = new JLabel("E-mail:");
+		
+		// Creating the Contact labels by retrieving info from selected entry
+		contactNameLabel = new JLabel(Book.addressBook.get(contact).getName());
+		contactPhoneNumberLabel = new JLabel(Book.addressBook.get(contact).getPhoneNumber());
+		contactEmailLabel = new JLabel(Book.addressBook.get(contact).getEmail());
+		
+		// Adding the JLabels to the labelPanel
+		labelPanel.add(nameLabel);
+		labelPanel.add(phoneNumberLabel);
+		labelPanel.add(emailLabel);
+		
+		// Adding the JLabels to the contactPanel
+		contactPanel.add(contactNameLabel);
+		contactPanel.add(contactPhoneNumberLabel);
+		contactPanel.add(contactEmailLabel);
+		
+		// Adding the JButtons to the buttonPanel
+		buttonPanel.add(editButton);
+		buttonPanel.add(backButton);
+		
+		// Adding and aligning the Panels
+		setBorder(BorderFactory.createEmptyBorder(45, 45, 45, 45));
+		add(labelPanel, BorderLayout.WEST);
+		add(contactPanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.EAST);
+		
+		
+		return this;
+	}
+
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		if(e.getSource() == editButton) {
+			editContact();
+		}
+		
+		if(e.getSource() == saveButton) {
+			saveContact();
+		}
+		
+		if(e.getSource() == backButton) {
+			backButton();
+		}
+		
+	}
+	
+	private void editContact() {
+		
+		saveButton = new JButton("Save");
+		saveButton.addActionListener(this);
+		
+		nameField = new JTextField(Book.addressBook.get(contact).getName());
+		phoneNumField = new JTextField(Book.addressBook.get(contact).getPhoneNumber());
+		emailField = new JTextField(Book.addressBook.get(contact).getEmail(), 10);
+		
+		buttonPanel.remove(backButton);
+		buttonPanel.remove(editButton);
+		contactPanel.remove(contactNameLabel);
+		contactPanel.remove(contactPhoneNumberLabel);
+		contactPanel.remove(contactEmailLabel);
+		
+		buttonPanel.add(saveButton);
+		buttonPanel.add(backButton);
+		
+		contactPanel.add(nameField);
+		contactPanel.add(phoneNumField);
+		contactPanel.add(emailField);
+		
+		
+		this.revalidate();
+		this.repaint();
+	}
+	
+	private void saveContact() {
+		
+		Book.addressBook.remove(contact);
+		
+		String name = nameField.getText();
+		String phoneNumber = phoneNumField.getText();
+		String email = emailField.getText();
+		
+		if (!nameField.getText().isEmpty()) {
+			
+			Book.addressBook.put(name, new Contact(name, phoneNumber, email));
+			
+		} else if (!phoneNumField.getText().isEmpty()) {
+
+			Book.addressBook.put(phoneNumber, new Contact(name, phoneNumber, email));
+
+		} else if (!emailField.getText().isEmpty()) {
+
+			Book.addressBook.put(email, new Contact(name, phoneNumber, email));
+		}
+		
+		this.removeAll();
+		this.add(new UserInterface().mainScreen());
+		this.revalidate();
+		this.repaint();
+		
+	}
+	
+	private void backButton() {
+		
+		this.removeAll();
+		this.add(new UserInterface().mainScreen());
+		this.revalidate();
+		this.repaint();
+		
+	}
+	
+}
